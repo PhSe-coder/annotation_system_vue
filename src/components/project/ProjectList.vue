@@ -14,25 +14,7 @@ import ProjectItem from "./ProjectItem";
 import {request} from "../../network/request";
 import bus from "../bus";
 
-$(document).ready(function () {
-  $(document).on('mouseenter', '[data-toggle="tooltip"]', function () {
-    let content = $(this)[0].innerText
-    $(this).tooltip({
-      container: 'body',
-      title: content
-    }).tooltip('show')
-  })
-  $(".card").hover(function () {
-    $(this).addClass('shadow').css('transition', 'all 0.4s');
-  }, function () {
-    $(this).removeClass('shadow');
-  })
-  let myModal = new window.bootstrap.Modal(document.getElementById('staticBackdrop_project_1'), {
-    focus: true,
-    keyboard: false
-  })
-  myModal.show()
-})
+
 export default {
   name: "ProjectList",
   data() {
@@ -62,7 +44,8 @@ export default {
     bus.$on("update_project", () => {
       this.get_project_list()
     })
-  }
+  },
+
 }
 </script>
 

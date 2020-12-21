@@ -2,19 +2,22 @@
   <div class="col-md-6 rol-xl-3">
     <div class="card">
       <div class="card-header d-flex">
-        <span>{{ name }}</span>
-        <div class="d-inline-block text-right flex-grow-1">
-          <a class="btn fa fa-cog text-decoration-none" style="color: inherit" data-toggle="dropdown"
-             aria-haspopup="true" aria-expanded="false" aria-hidden="true"></a>
-          <div class="dropdown-menu dropdown-menu-right" style="max-width: 50px">
-            <a class="btn dropdown-item">
-              <i class="fa fa-pencil-square mr-1" aria-hidden="true"></i>
-              Edit
-            </a>
-            <a class="btn dropdown-item" @click="deleteProject($event,name)">
-              <i class="fa fa-trash mr-1" aria-hidden="true"></i>
-              Delete</a>
-          </div>
+        <div class="flex-grow-1">
+          <span>{{ name }}</span>
+          <b-dropdown variant="none" no-caret left style="color: inherit">
+            <template #button-content>
+              <i class="fa fa-cog"></i>
+            </template>
+            <b-dropdown-item>
+              <i class="fa fa-pencil-square mr-1" aria-hidden="true"></i>Edit
+            </b-dropdown-item>
+            <b-dropdown-item @click="$bvModal.show('modal'+name)">
+              <i class="fa fa-trash mr-1" aria-hidden="true"></i>Delete
+            </b-dropdown-item>
+          </b-dropdown>
+          <b-modal :id="'modal'+name" title="警告" size="sm" @ok="deleteProject($event,name)">
+            是否删除该项目
+          </b-modal>
         </div>
       </div>
       <div class="card-body text-muted">
@@ -48,29 +51,11 @@
         </div>
       </div>
       <div class="card-footer">
-        <h6 class="text-muted mt-2 mb-2 card-description" data-toggle="tooltip" data-placement="bottom">
+        <h6 class="text-muted mt-2 mb-2 card-description" v-b-tooltip.hover :title="description">
           {{ description }}
         </h6>
       </div>
     </div>
-    <div class="modal fade" :id="'staticBackdrop_'+name" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            ...
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Understood</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
 
@@ -127,6 +112,13 @@ export default {
         bus.$emit('update_project')
       })
     }
+  },
+  mounted() {
+    $(".card").hover(function () {
+      $(this).addClass('shadow').css('transition', 'all 0.5s');
+    }, function () {
+      $(this).removeClass('shadow');
+    })
   }
 }
 </script>

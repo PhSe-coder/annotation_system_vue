@@ -7,8 +7,7 @@
 <style>
 /* 设置滚动条的样式 */
 body::-webkit-scrollbar {
-  width:12px;
-
+  width:18px;
 }
 /* 滚动槽 */
 ::-webkit-scrollbar-track {

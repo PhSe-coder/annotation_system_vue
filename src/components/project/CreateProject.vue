@@ -49,7 +49,6 @@
 <script>
 import bsCustomFileInput from 'bs-custom-file-input'
 import {request} from '@/network/request'
-import axios from "axios";
 import bus from "../bus";
 
 

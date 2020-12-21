@@ -4,10 +4,20 @@ import router from './router'
 import store from './store'
 
 import jQuery from 'jquery/dist/jquery.js'
+import 'popper.js'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.js'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+import {BootstrapVue, IconsPlugin} from 'bootstrap-vue'
+
+Vue.use(BootstrapVue, {
+  BDropdown:{
+    tag: 'a'
+  }
+})
+Vue.use(IconsPlugin)
 window.$  = jQuery
-window.bootstrap = bootstrap
+
+
 Vue.config.productionTip = true
 new Vue({
   router,
