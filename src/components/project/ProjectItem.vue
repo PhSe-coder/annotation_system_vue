@@ -1,24 +1,22 @@
 <template>
   <div class="col-md-6 rol-xl-3">
     <div class="card">
-      <div class="card-header d-flex">
-        <div class="flex-grow-1">
-          <span>{{ name }}</span>
-          <b-dropdown variant="none" no-caret left style="color: inherit">
-            <template #button-content>
-              <i class="fa fa-cog"></i>
-            </template>
-            <b-dropdown-item>
-              <i class="fa fa-pencil-square mr-1" aria-hidden="true"></i>Edit
-            </b-dropdown-item>
-            <b-dropdown-item @click="$bvModal.show('modal'+name)">
-              <i class="fa fa-trash mr-1" aria-hidden="true"></i>Delete
-            </b-dropdown-item>
-          </b-dropdown>
-          <b-modal :id="'modal'+name" title="警告" size="sm" @ok="deleteProject($event,name)">
-            是否删除该项目
-          </b-modal>
-        </div>
+      <div class="card-header">
+        <span>{{ name }}</span>
+        <b-dropdown variant="none" no-caret left style="color: inherit">
+          <template #button-content>
+            <i class="fa fa-cog"></i>
+          </template>
+          <b-dropdown-item>
+            <i class="fa fa-pencil-square mr-1" aria-hidden="true"></i>Edit
+          </b-dropdown-item>
+          <b-dropdown-item @click="$bvModal.show('modal'+name)">
+            <i class="fa fa-trash mr-1" aria-hidden="true"></i>Delete
+          </b-dropdown-item>
+        </b-dropdown>
+        <b-modal :id="'modal'+name" title="警告" size="sm" @ok="deleteProject($event,name)">
+          是否删除该项目
+        </b-modal>
       </div>
       <div class="card-body text-muted">
         <span v-if="progress.toFixed() === '100'" class="badge badge-success">Finished</span>
@@ -52,7 +50,7 @@
       </div>
       <div class="card-footer">
         <h6 class="text-muted mt-2 mb-2 card-description" v-b-tooltip.hover :title="description">
-          {{ description }}
+          {{ description }}&nbsp;
         </h6>
       </div>
     </div>
@@ -86,26 +84,26 @@ export default {
       default: 3,
       required: true
     },
-    description:{
+    description: {
       type: String,
       default: '这是一个文本标注项目',
       required: false
     },
-    progress:{
+    progress: {
       type: Number,
       default: 0,
       required: true
     }
   },
   methods: {
-    deleteProject(e, name){
+    deleteProject(e, name) {
       console.log(name)
       request({
-        config:{
+        config: {
           method: 'get',
-          url:'/api/annotation_task/delete_project',
-          params:{
-            project_name:name
+          url: '/api/annotation_task/delete_project',
+          params: {
+            project_name: name
           }
         }
       }).then(res => {

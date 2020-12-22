@@ -27,7 +27,7 @@
       <div class="form-group">
         <label for="project_members">标注成员</label>
         <select v-model="project_members" id="project_members" class="custom-select" size="4" multiple required>
-          <option v-for="user in users" :value="user" >{{user}}</option>
+          <option v-for="user in users" :value="user['username']" >{{user['username']}}</option>
         </select>
       </div>
       <div class="form-group">
@@ -39,9 +39,7 @@
         <span v-else>
           <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...
         </span>
-
       </button>
-
     </form>
   </div>
 </template>
@@ -52,23 +50,20 @@ import {request} from '@/network/request'
 import bus from "../bus";
 
 
-$(document).ready(function () {
-  bsCustomFileInput.init()
-})
 export default {
   name: "CreateProject",
   created() {
+    bsCustomFileInput.init()
     request({
       config: {
         method: 'post',
-        url: '/api/user/get_users/',
+        url: '/api/user/get_username/',
         headers: {
           'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
         }
       }
     }).then(res =>{
-      let result = res.data
-      this.users = result['users'].split(',')
+      this.users = res.data
     })
   },
   data(){

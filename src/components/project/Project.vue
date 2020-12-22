@@ -7,7 +7,7 @@
           <span class="ml-1">创建项目</span>
         </router-link>
       </div>
-      <div class="col-8">
+      <div class="col-6">
         <div class="text-center">
           <button class="btn btn-primary">All</button>
           <div class="btn-group ml-2" role="group" aria-label="button group">
@@ -16,6 +16,9 @@
           </div>
         </div>
       </div>
+      <div class="col-2">
+        <button class="btn btn-dark" @click="logout">Logout</button>
+      </div>
     </div>
     <project-list></project-list>
   </div>
@@ -23,6 +26,7 @@
 
 <script>
 import ProjectList from "./ProjectList";
+import {request} from "../../network/request";
 
 
 export default {
@@ -30,6 +34,24 @@ export default {
   components: {
     ProjectList
   },
+  methods:{
+    logout(){
+      request({
+        config:{
+          method:'post',
+          url:'/api/user/logout/',
+          headers: {
+            'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
+          }
+        }
+      }).then(res => {
+        let result = res.data
+        if(result.status === 'success'){
+          this.$router.replace({name: 'login'})
+        }
+      })
+    }
+  }
 }
 </script>
 
