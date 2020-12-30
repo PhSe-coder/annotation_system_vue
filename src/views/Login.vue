@@ -84,7 +84,6 @@ export default {
         target.classList.add('was-validated');
       } else {
         this.login()
-        localStorage.setItem('user',this.username)
       }
     }
   },
