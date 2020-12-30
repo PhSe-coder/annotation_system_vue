@@ -68,7 +68,7 @@ export default {
           if(!result['is_superuser'])
             this.$router.replace({name: 'Home',})
           else
-            this.$router.replace({name: 'Admin',})
+            this.$router.replace({name: 'admin_project',})
         } else {
           alert('用户名或密码不正确')
         }
@@ -84,10 +84,11 @@ export default {
         target.classList.add('was-validated');
       } else {
         this.login()
+        localStorage.setItem('user',this.username)
       }
     }
   },
-  beforeRouteEnter: async (to, from, next) => {
+  beforeRouteEnter: (to, from, next) => {
     if (!Vue.$cookies.get('sessionid')) {
       next()
       return

@@ -13,8 +13,14 @@ Vue.use(VueCookies)
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
+    component: Home,
+    children: [
+      {
+        path: '',
+        name: 'Home',
+        component: () => import(/* webpackChunkName: "home" */ '../components/Home/Home'),
+      }
+    ]
   },
   {
     path: '/admin',
@@ -24,27 +30,19 @@ const routes = [
     component: () => import(/* webpackChunkName: "admin" */ '../views/Admin.vue'),
     children: [
       {
-        path:'',
-        name: 'Admin',
-        redirect: {name: 'admin_project'}
-      },
-      {
-        path: 'project',
+        path: '',
         name: 'admin_project',
-        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/project/Project.vue' ),
-        children: [
-
-        ]
+        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/Project.vue' ),
       },
       {
         path: 'create_project',
         name: 'admin_create_project',
-        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/project/CreateProject.vue' )
+        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/CreateProject.vue' )
       },
       {
         path: 'users',
         name: 'admin_users',
-        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/Users.vue' )
+        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/ProjectUsers.vue' )
       },
     ]
   },

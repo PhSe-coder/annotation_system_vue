@@ -2,14 +2,14 @@
   <div class="d-flex">
     <side-bar></side-bar>
     <keep-alive>
-      <router-view class="content"></router-view>
+      <router-view class="content"/>
     </keep-alive>
   </div>
 </template>
 
 <script>
 import {request} from '@/network/request'
-import SideBar from "../components/SideBar";
+import SideBar from "../components/admin/SideBar";
 
 export default {
   name: "Admin",

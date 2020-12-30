@@ -47,7 +47,7 @@ export default {
       }).then(res => {
         let result = res.data
         if(result.status === 'success'){
-          this.$router.replace({name: 'login'})
+          window.location.reload()
         }
       })
     }
