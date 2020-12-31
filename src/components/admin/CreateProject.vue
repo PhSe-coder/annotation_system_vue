@@ -52,8 +52,10 @@ import bus from "../bus";
 
 export default {
   name: "CreateProject",
-  created() {
+  mounted() {
     bsCustomFileInput.init()
+  },
+  created() {
     request({
       config: {
         method: 'post',

@@ -70,35 +70,37 @@ export default {
     }
   },
   methods: {
-    logout(){
+    logout() {
       request({
-        config:{
-          url:'/api/user/logout/',
-          method:'post',
-          headers:{
+        config: {
+          url: '/api/user/logout/',
+          method: 'post',
+          headers: {
             'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
           }
         }
       }).then(res => {
         let result = res.data
-        if(result.status === 'success'){
+        if (result.status === 'success') {
           window.location.reload()
         }
       })
     },
     edit(e, name) {
-      console.log(e)
-      console.log(name)
+      this.$router.push({
+        name: 'project_edit', query: {id:name}
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-#nav a{
+#nav a {
   text-decoration: none;
   transition: color 300ms ease-in-out;
 }
+
 #nav a.router-link-exact-active {
   color: white;
 }

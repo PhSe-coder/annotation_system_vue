@@ -17,9 +17,18 @@ const routes = [
     children: [
       {
         path: '',
+        redirect: '/index'
+      },
+      {
+        path: '/index',
         name: 'Home',
         component: () => import(/* webpackChunkName: "home" */ '../components/Home/Home'),
-      }
+      },
+      {
+        path: '/project',
+        name:'project_edit',
+        component: () => import(/* webpackChunkName: "project_edit" */ '../components/Home/ProjectEdit'),
+      },
     ]
   },
   {
@@ -35,12 +44,12 @@ const routes = [
         component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/Project.vue' ),
       },
       {
-        path: 'create_project',
+        path: '/create_project',
         name: 'admin_create_project',
         component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/CreateProject.vue' )
       },
       {
-        path: 'users',
+        path: '/users',
         name: 'admin_users',
         component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/ProjectUsers.vue' )
       },
@@ -51,6 +60,11 @@ const routes = [
     name: 'Login',
     component: () => import(/* webpackChunkName: "login" */ '../views/Login.vue'),
   },
+  {
+    path: '*',
+    name:'Page404',
+    component: () => import(/* webpackChunkName: "Page404" */ '../views/Page404.vue'),
+  }
 ]
 
 const router = new VueRouter({
