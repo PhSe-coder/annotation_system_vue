@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar toggleable="lg" class="" type="dark" variant="dark">
+    <b-navbar toggleable="lg" type="dark" variant="dark">
       <b-navbar-brand href="#">{{ project_info.project_name }}</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
       <b-collapse id="nav-collapse" is-nav>
@@ -19,61 +19,53 @@
       </b-collapse>
     </b-navbar>
     <main class="container mt-3">
-      <!--      <b-tabs vertical pills nav-wrapper-class="col-4" >-->
-      <!--        <b-tab v-for="(item,index) in data" :key="item.id" title-link-class="tab_content">-->
-      <!--          <template #title>-->
-      <!--            <div class="d-flex w-100 justify-content-between">-->
-      <!--              <h5 class="mb-1">Task {{ item.id }}</h5>-->
-      <!--              <small>3 days ago</small>-->
-      <!--            </div>-->
-      <!--            <p class="mb-1">{{ item.text }}</p>-->
-      <!--            <span v-for="(value,i) in item.annotators">-->
-      <!--                              <b-icon v-if="item.status[i] === 1" style="vertical-align: text-bottom"-->
-      <!--                                      icon="check-square"-->
-      <!--                                      variant="success" font-scale="1"></b-icon>-->
-      <!--                              <b-icon style="vertical-align: text-bottom" v-else icon="x-square" variant="danger"-->
-      <!--                                      font-scale="1"></b-icon>-->
-      <!--                              <small class="ml-2">{{ value }} </small>-->
-      <!--                            </span>-->
-      <!--          </template>-->
-      <!--          <p class="p-3">{{ item.text }}</p>-->
-      <!--        </b-tab>-->
-      <!--      </b-tabs>-->
       <div class="row">
-        <b-list-group id="list-group" class="col-4">
-          <b-list-group-item href="#" v-for="(item,index) in data" :key="item.id"
-                             @click="setActive($event, index)"
-                             :class="{active: index === activeItem}"
-                             class="flex-column align-items-start">
-            <!--            <div class="d-flex w-100 justify-content-between">-->
-            <!--              <h5 class="mb-1">Task {{ item.id }}</h5>-->
-            <!--              <small>3 days ago</small>-->
-            <!--            </div>-->
-            <p class="mb-1 small">{{ item.text }}</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <span>
-                <span v-for="(value,i) in item.annotators">
-                  <b-icon v-if="item.status[i] === 1" style="vertical-align: text-bottom" icon="check-square"
-                          variant="success" font-scale="1"></b-icon>
-                  <b-icon v-else icon="x-square" style="vertical-align: text-bottom" variant="danger"
-                          font-scale="1"></b-icon>
-                  <small class="ml-2">{{ value }} </small>
-                </span>
-              </span>
-              <small class="font-weight-bold">3 days ago</small>
-            </div>
-          </b-list-group-item>
-        </b-list-group>
+        <div class="col-4">
+          <b-table table-class="item-table" borderless thead-class="d-none" :items="data" :fields="field" :per-page="perPage" :current-page="currentPage">
+            <template #cell(text)="data">
+              <b-list-group-item href="javascript:void(0)" @click="setActive($event, data.index)" :class="{active: data.index + (currentPage-1)*perPage === activeItem}">
+                <small>{{ data.item.text }}</small>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span>
+                    <span v-for="(value,i) in data.item.annotators">
+                      <b-icon v-if="data.item.status[i] === 1" style="vertical-align: text-bottom"
+                              icon="check-square"
+                              variant="success" font-scale="1"></b-icon>
+                      <b-icon v-else icon="x-square" style="vertical-align: text-bottom" variant="danger"
+                              font-scale="1"></b-icon>
+                      <small class="ml-2">{{ value }} </small>
+                    </span>
+                  </span>
+                  <small class="font-weight-bold">3 days ago</small>
+                </div>
+              </b-list-group-item>
+            </template>
+          </b-table>
+          <b-pagination class="mt-3" v-model="currentPage" :total-rows="data.length" :per-page="perPage"
+                        align="center"></b-pagination>
+        </div>
         <div class="col-8" id="annotation_content">
-          <div class="container pt-2 tab-content tab_content " style="height: 80%">
-            <div v-for="(item,index) in data" :key="item.id" class="tab-pane fade"
-                 :class="{show:index === activeItem, active:index === activeItem}">{{ item.text }}
-            </div>
+          <div class="container pt-2 tab_content " style="height: 70%">
+            <p v-if="data[activeItem]">{{ data[activeItem]['text'] }}</p>
           </div>
-          <div class="d-flex justify-content-center align-items-center" style="height: 20%">
-            <b-button size="lg" class="mx-2" variant="info"><b-icon icon="record-circle"></b-icon></b-button>
-            <b-button size="lg" class="mx-2" variant="danger"><b-icon icon="x"></b-icon></b-button>
-            <b-button size="lg" class="mx-2" variant="success"><b-icon icon="check"></b-icon></b-button>
+          <div class="d-flex justify-content-between align-items-center" style="height: 30%">
+            <b-button @click="activeItem_minus" size="lg" class="mx-2" variant="secondary">
+              <b-icon icon="arrow-left-circle"></b-icon>
+            </b-button>
+            <span>
+              <b-button @click="annotate" size="lg" class="mx-2" variant="info">
+              <b-icon icon="record-circle"></b-icon>
+            </b-button>
+              <b-button size="lg" class="mx-2" variant="danger">
+              <b-icon icon="x"></b-icon>
+            </b-button>
+              <b-button size="lg" class="mx-2" variant="success">
+              <b-icon icon="check"></b-icon>
+            </b-button>
+            </span>
+            <b-button @click="activeItem_add" size="lg" class="mx-2" variant="secondary">
+              <b-icon icon="arrow-right-circle"></b-icon>
+            </b-button>
           </div>
         </div>
       </div>
@@ -89,8 +81,13 @@ export default {
   data() {
     return {
       activeItem: 0,
+      currentPage:1,
+      perPage: 4,
       project_info: {},
-      data: ''
+      data: [],
+      field: [
+        {key:'text',class:'p-0'}
+      ]
     }
   },
   methods: {
@@ -119,6 +116,31 @@ export default {
       } else {
         return ['bg-light', 'text-info']
       }
+    },
+    annotate() {
+      let formData = new FormData()
+      formData.append('text', this.data[this.activeItem].text)
+      request({
+        config: {
+          url: 'api/annotation_task/annotate/',
+          method: 'post',
+          data: formData,
+          headers: {
+            'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
+          },
+          timeout: 10000
+        }
+      }).then(res => {
+
+      })
+    },
+    activeItem_minus() {
+      this.activeItem > 0 ? this.activeItem-- : this.activeItem
+      this.currentPage =  Math.floor(this.activeItem/this.perPage + 1)
+    },
+    activeItem_add() {
+      this.activeItem < this.data.length - 1 ? this.activeItem++ : this.activeItem
+      this.currentPage = Math.floor(this.activeItem/this.perPage + 1)
     }
   },
   beforeRouteEnter: (to, from, next) => {
@@ -145,7 +167,7 @@ export default {
   },
   created() {
     request({
-      config:{
+      config: {
         url: 'api/annotation_task/get_project_overview/',
         method: 'get',
         params: {
@@ -154,6 +176,15 @@ export default {
       }
     }).then(res => {
       this.project_info = res.data
+    })
+    // 这里必须要使用lambda表达式，不能写成function，否则由于作用域的问题会导致this指向改变
+    $(document).keydown(e => {
+      let keycode = e.keyCode
+      if (keycode === 37 || keycode === 38) {
+        this.activeItem_minus()
+      } else if (keycode === 39 || keycode === 40) {
+        this.activeItem_add()
+      }
     })
   }
 }
@@ -167,7 +198,11 @@ p {
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
+
 .tab_content {
   box-shadow: 0 0 5px #888888;
+}
+.item-table {
+  height: 400px;
 }
 </style>
