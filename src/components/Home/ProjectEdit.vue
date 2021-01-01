@@ -21,9 +21,11 @@
     <main class="container mt-3">
       <div class="row">
         <div class="col-4">
-          <b-table table-class="item-table" borderless thead-class="d-none" :items="data" :fields="field" :per-page="perPage" :current-page="currentPage">
+          <b-table table-class="item-table" borderless thead-class="d-none" :items="data" :fields="field"
+                   :per-page="perPage" :current-page="currentPage">
             <template #cell(text)="data">
-              <b-list-group-item href="javascript:void(0)" @click="setActive($event, data.index)" :class="{active: data.index + (currentPage-1)*perPage === activeItem}">
+              <b-list-group-item href="javascript:void(0)" @click="setActive($event, data.index)"
+                                 :class="{active: data.index + (currentPage-1)*perPage === activeItem}">
                 <small>{{ data.item.text }}</small>
                 <div class="d-flex justify-content-between align-items-center">
                   <span>
@@ -81,12 +83,12 @@ export default {
   data() {
     return {
       activeItem: 0,
-      currentPage:1,
+      currentPage: 1,
       perPage: 4,
       project_info: {},
       data: [],
       field: [
-        {key:'text',class:'p-0'}
+        {key: 'text', class: 'p-0'}
       ]
     }
   },
@@ -136,11 +138,11 @@ export default {
     },
     activeItem_minus() {
       this.activeItem > 0 ? this.activeItem-- : this.activeItem
-      this.currentPage =  Math.floor(this.activeItem/this.perPage + 1)
+      this.currentPage = Math.floor(this.activeItem / this.perPage + 1)
     },
     activeItem_add() {
       this.activeItem < this.data.length - 1 ? this.activeItem++ : this.activeItem
-      this.currentPage = Math.floor(this.activeItem/this.perPage + 1)
+      this.currentPage = Math.floor(this.activeItem / this.perPage + 1)
     }
   },
   beforeRouteEnter: (to, from, next) => {
@@ -202,6 +204,7 @@ p {
 .tab_content {
   box-shadow: 0 0 5px #888888;
 }
+
 .item-table {
   height: 400px;
 }
