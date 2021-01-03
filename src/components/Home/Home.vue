@@ -3,10 +3,10 @@
     <b-navbar id="nav" sticky toggleable="md" type="dark" variant="dark">
       <b-navbar-brand href="#">文本标注系统</b-navbar-brand>
       <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-      <b-collapse id="nav-collapse" is-nav class="ml-2">
+      <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item>
-            <router-link :to="{name: ''}">我的项目</router-link>
+            <router-link :to="{name: 'Home'}">我的项目</router-link>
           </b-nav-item>
           <b-nav-item href="#">其他</b-nav-item>
         </b-navbar-nav>
@@ -47,7 +47,7 @@ import {request} from "../../network/request";
 
 export default {
   name: "Home",
-  mounted() {
+  created() {
     request({
       config: {
         url: 'api/user/get_userinfo/',
@@ -87,6 +87,7 @@ export default {
       })
     },
     edit(e, name) {
+      console.log(name)
       this.$router.push({
         name: 'project_edit', query: {id:name}
       })

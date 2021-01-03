@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import VueCookies from 'vue-cookies'
 import Home from '../views/Home.vue'
 import {request} from '@/network/request'
+import Project from "../components/Home/Project";
 
 
 Vue.use(VueRouter)
@@ -26,9 +27,21 @@ const routes = [
       },
       {
         path: '/project',
-        name:'project_edit',
-        component: () => import(/* webpackChunkName: "project_edit" */ '../components/Home/ProjectEdit'),
+        component: Project,
+        children:[
+          {
+            path: '',
+            name:'project_edit',
+            component: () => import(/* webpackChunkName: "project_edit" */ '../components/Home/ProjectEdit'),
+          },
+          {
+            path: '/tag_manage',
+            name:'tag_manage',
+            component: () => import(/* webpackChunkName: "tag_manage" */ '../components/Home/TagManage'),
+          },
+        ]
       },
+
     ]
   },
   {
