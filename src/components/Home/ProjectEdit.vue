@@ -3,7 +3,7 @@
     <div class="annotation_alert">
       <b-alert :show="dismissCountDown" fade :variant="alertType" @dismiss-count-down="countDownChanged">
         <b-icon icon="exclamation-triangle"></b-icon>
-        {{alertContent}}
+        {{ alertContent }}
       </b-alert>
     </div>
     <div class="row">
@@ -35,7 +35,7 @@
       </div>
       <div class="col-8" id="annotation_content">
         <div class="d-flex bg-info my-2 py-2 pl-2">
-          <b-badge v-for="tag in tags" class="mr-2" :style="tag.style">{{ tag.type }}
+          <b-badge v-for="tag in tags" :key="tag.keyChar" class="mr-2" :style="tag.style">{{ tag.type }}
             <b-badge variant="light" class="ml-2">
               {{ tag.keyChar }}
             </b-badge>
@@ -45,10 +45,12 @@
           <div v-if="isBusy">
             <div class="mask"></div>
             <div class="spinner">
-              <b-spinner type="grow" variant="primary" style="width: 3rem; height: 3rem;" label="Large Spinner"></b-spinner>
+              <b-spinner type="grow" variant="primary" style="width: 3rem; height: 3rem;"
+                         label="Large Spinner"></b-spinner>
             </div>
           </div>
-          <tag v-if="data[activeItem]" :key="activeItem" :tags="tags" :result="data[activeItem].result" :text="data[activeItem].text" ></tag>
+          <tag v-if="data[activeItem]" :key="activeItem" :tags="tags" :result="data[activeItem].result"
+               :text="data[activeItem].text"></tag>
         </div>
         <div class="d-flex justify-content-between align-items-md-baseline" style="height: 25%">
           <b-button @click="activeItem_minus" size="lg" class="mx-2" variant="secondary">
@@ -87,7 +89,7 @@ export default {
       activeItem: 0,
       currentPage: 1,
       perPage: 4,
-      isBusy:false,
+      isBusy: false,
       data: [],
       field: [
         {key: 'text', class: 'p-0'}
@@ -127,8 +129,8 @@ export default {
         },
       ],
       dismissCountDown: 0,
-      alertContent:'保存成功!',
-      alertType:'success'
+      alertContent: '保存成功!',
+      alertType: 'success'
     }
   },
   methods: {
@@ -156,30 +158,25 @@ export default {
         this.isBusy = false
         this.dismissCountDown = 1
         this.alertContent = '预标注成功！'
-        bus.$emit('annotate',res.data)
+        bus.$emit('annotate', res.data)
       })
     },
-    delete_annotate(){
+    delete_annotate() {
       console.log(typeof this.data[this.activeItem].result)
       let length = this.data[this.activeItem].result.length
-      // splice响应式更新数据
-      // 不能直接将其length设为0，这种做法不是响应式的
       this.data[this.activeItem].result.splice(0, length)
-      // console.log(this.data[this.activeItem].result)
-      // console.log(typeof this.data[this.activeItem].result)
-      // console.log(this.data[this.activeItem].result.toString())
     },
-    save_annotate(){
+    save_annotate() {
       this.isBusy = true
       console.log(this.data[this.activeItem].result)
       request({
-        config:{
-          url:'api/annotation_task/save_annotate/',
-          method:'post',
-          data:{
-            project_name:this.$route.query.id,
-            text:this.data[this.activeItem].text,
-            result:this.data[this.activeItem].result
+        config: {
+          url: 'api/annotation_task/save_annotate/',
+          method: 'post',
+          data: {
+            project_name: this.$route.query.id,
+            text: this.data[this.activeItem].text,
+            result: this.data[this.activeItem].result
           },
           headers: {
             'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
@@ -187,7 +184,7 @@ export default {
         }
       }).then(res => {
         this.isBusy = false
-        this.alertContent='保存成功!'
+        this.alertContent = '保存成功!'
         this.dismissCountDown = 1
 
       })
@@ -226,15 +223,29 @@ export default {
   created() {
     // 这里必须要使用lambda表达式，不能写成function，否则由于作用域的问题会导致this指向改变
     $(document).keydown(e => {
-      let keycode = e.keyCode
-      if (keycode === 37 || keycode === 38) {
+      let keyCode = e.keyCode
+      let keyChar = e.key
+      let tagType = ''
+      if (keyCode === 37 || keyCode === 38) {
         this.activeItem_minus()
-      } else if (keycode === 39 || keycode === 40) {
+      } else if (keyCode === 39 || keyCode === 40) {
         this.activeItem_add()
+      } else if (this.tags.findIndex( value => {
+        tagType = value.type
+        return value.keyChar === keyChar
+      }) !== -1) {
+        let selected = this.$store.state.selected
+        let index = this.data[this.activeItem].result.findIndex(value => {
+          return selected.start < value[2]
+        })
+        if(index === -1)
+          index = this.data[this.activeItem].result.length
+        this.data[this.activeItem].result.splice(index, 0, [selected.text, tagType, selected.start, selected.end])
+        window.getSelection().empty()
       }
     })
-    bus.$on('set_annotate',(annotate_result)=>{
-      this.data[this.activeItem].result = annotate_result
+    bus.$on('update_annotate', (annotate_result) => {
+      this.$set(this.data[this.activeItem], 'result', annotate_result)
     })
   },
 }
@@ -256,27 +267,30 @@ p {
 .item-table {
   height: 400px;
 }
-.mask{
+
+.mask {
   position: absolute;
   top: 0;
   left: 0;
-  background-color: rgba(247,247,247,1);
+  background-color: rgba(247, 247, 247, 1);
   opacity: 0.5;
   width: 100%;
   height: 100%;
   z-index: 1;
 }
-.spinner{
+
+.spinner {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform:translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   z-index: 2;
 }
+
 .annotation_alert {
   position: absolute;
   top: 2%;
   left: 50%;
-  transform:translate(-50%,0);
+  transform: translate(-50%, 0);
 }
 </style>

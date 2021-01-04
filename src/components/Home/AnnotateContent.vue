@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p id="content">{{ html_content }}</p>
+    <p style="line-height: 2" id="content">{{ text }}</p>
   </div>
 </template>
 
@@ -42,10 +42,10 @@ export default {
   },
   watch: {
     result: {
-      handler: function (newValue, oldValue) {
+      handler: function (newValue) {
+        console.log(newValue)
         this.setTags(newValue)
       },
-      deep:true
     }
   },
   methods: {
@@ -53,18 +53,45 @@ export default {
       let tag = document.createElement('p')
       tag.style.lineHeight = '2'
       tag.id = 'content'
+      tag.onmouseup = (ev) => {
+        let ele = document.getElementById('content')
+        if (!window.getSelection().anchorNode) {
+          return
+        }
+        const range = window.getSelection().getRangeAt(0);
+        let start, end = 0
+        if (!range.collapsed) {
+          const preSelectionRange = document.createRange()
+          preSelectionRange.selectNodeContents(ele);
+          preSelectionRange.setEnd(range.startContainer, range.startOffset);
+          start = preSelectionRange.toString().length;
+          end = start + range.toString().length;
+          console.log(start, end);
+          let isValid = true
+          for (const item of Data) {
+            if ((start >= item[2] && start < item[3]) || (end > item[2] && end <= item[3]) || (start <= item[2] && end >= item[3]))
+              isValid = false
+          }
+          console.log(isValid)
+          if (isValid) {
+            this.$store.commit('setSelected', {start:start, end:end, text:range.toString()})
+          }
+        }
+      }
       let nodeList = [0, 0]
       for (const datum of Data) {
         nodeList[1] = (datum[2])
-        tag.appendChild(document.createTextNode(this.text.slice(nodeList[0], nodeList[1])))
+        tag.append(this.text.slice(nodeList[0], nodeList[1]))
         let result = this.tags.find(value => {
           return value.type === datum[1]
         })
         let MyComponent = Vue.extend({
-          template: `
-            <b-badge style="font-size: inherit; font-weight: normal" :style="result.style">{{ datum }}
-            <b-avatar button @click="deleteTag" icon="x" variant="light" :size="16"></b-avatar>
-            </b-badge>`,
+          // template不能换行，换行会有bug，会导致鼠标选中的文本的位置不对！
+          template: "<b-badge style='font-size: inherit; font-weight: normal' :style='result.style'>{{ datum }}<b-avatar class='ml-1' button icon='x' variant='light' @click='deleteTag' :size='16'></b-avatar></b-badge>",
+          // template: `
+          //   <b-badge style="font-size: inherit; font-weight: normal" :style="result.style">{{ datum }}
+          //   <b-avatar  button icon="x" variant="light" @click="deleteTag" :size="16"></b-avatar>
+          //   </b-badge>`,
           components: {
             BBadge, BAvatar
           },
@@ -80,21 +107,21 @@ export default {
                 return value[0] === this.datum
               })
               Data.splice(index, 1)
-              bus.$emit('set_annotate', Data)
+              bus.$emit('update_annotate', Data)
             },
           }
         })
         let component = new MyComponent().$mount()
-        tag.appendChild(component.$el)
+        tag.append(component.$el)
         nodeList[0] = datum[3]
       }
       if (nodeList[0] !== this.text.length) {
         nodeList[1] = this.text.length
-        tag.appendChild(document.createTextNode(this.text.slice(nodeList[0], nodeList[1])))
+        tag.append(this.text.slice(nodeList[0], nodeList[1]))
       }
       let ele = document.getElementById('content')
       ele.replaceWith(tag)
-      bus.$emit('set_annotate', Data)
+      bus.$emit('update_annotate', Data)
     }
   }
 }
