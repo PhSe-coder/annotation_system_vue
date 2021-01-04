@@ -161,6 +161,8 @@ export default {
         this.alertContent = '预标注成功！'
         bus.$emit('annotate', res.data)
       },error => {
+        console.log(error)
+        this.dismissCountDown = 1
         this.alertType = 'danger'
         this.alertContent = '标注超时！'
       })
