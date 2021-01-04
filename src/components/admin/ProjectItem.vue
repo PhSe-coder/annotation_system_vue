@@ -40,11 +40,11 @@
         </div>
         <div class="row">
           <h6 class="card-text col-8">Progress</h6>
-          <h6 class="card-text col-4 text-right">{{ progress.toFixed() }}%</h6>
+          <h6 class="card-text col-4 text-right">{{ task_progress }}%</h6>
         </div>
         <div class="progress">
           <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar"
-               :style="{width: progress.toFixed()}" :aria-valuenow="progress.toFixed()"
+               :style="{width: task_progress+'%'}" :aria-valuenow="task_progress"
                aria-valuemin="0" aria-valuemax="100"></div>
         </div>
       </div>
@@ -63,6 +63,12 @@ import bus from "../bus";
 
 export default {
   name: "ProjectItem",
+  computed:{
+    task_progress(){
+      console.log(this.progress.toFixed(2)*100)
+      return this.progress.toFixed(2)*100
+    }
+  },
   props: {
     name: {
       type: String,

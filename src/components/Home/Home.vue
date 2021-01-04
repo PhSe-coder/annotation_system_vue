@@ -27,7 +27,7 @@
           {{ data.index + 1 }}
         </template>
         <template #cell(state)="data">
-          <div v-if="data.item.state">
+          <div v-if="data.item.state === 1">
             <b-badge variant="success">Finished</b-badge>
           </div>
           <div v-else>

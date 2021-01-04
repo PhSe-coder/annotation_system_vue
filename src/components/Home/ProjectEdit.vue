@@ -60,10 +60,10 @@
               <b-button @click="annotate" size="lg" class="mx-2" variant="info">
               <b-icon icon="record-circle"></b-icon>
             </b-button>
-              <b-button @click="delete_annotate" size="lg" class="mx-2" variant="danger">
+              <b-button @click="save_annotate($event,0)" size="lg" class="mx-2" variant="danger">
               <b-icon icon="x"></b-icon>
             </b-button>
-              <b-button @click="save_annotate" size="lg" class="mx-2" variant="success">
+              <b-button @click="save_annotate($event,1)" size="lg" class="mx-2" variant="success">
               <b-icon icon="check"></b-icon>
             </b-button>
             </span>
@@ -157,18 +157,37 @@ export default {
       }).then(res => {
         this.isBusy = false
         this.dismissCountDown = 1
+        this.alertType = 'success'
         this.alertContent = '预标注成功！'
         bus.$emit('annotate', res.data)
+      },error => {
+        this.alertType = 'danger'
+        this.alertContent = '标注超时！'
       })
     },
     delete_annotate() {
-      console.log(typeof this.data[this.activeItem].result)
+      let index = this.data[this.activeItem].annotators.findIndex(value => {
+        return value === this.$store.state.username
+      })
+      this.data[this.activeItem].status[index] = 0
       let length = this.data[this.activeItem].result.length
       this.data[this.activeItem].result.splice(0, length)
     },
-    save_annotate() {
+    save_annotate(ev, status) {
+      let index = this.data[this.activeItem].annotators.findIndex(value => {
+        return value === this.$store.state.username
+      })
+      if(status === 0){
+        let result = window.confirm('是否清除所有标注项！\n（注：该操作将同步到服务器）')
+        if(result){
+          let length = this.data[this.activeItem].result.length
+          this.data[this.activeItem].result.splice(0, length)
+        }else{
+          return
+        }
+      }
+      this.data[this.activeItem].status[index] = status
       this.isBusy = true
-      console.log(this.data[this.activeItem].result)
       request({
         config: {
           url: 'api/annotation_task/save_annotate/',
@@ -176,7 +195,8 @@ export default {
           data: {
             project_name: this.$route.query.id,
             text: this.data[this.activeItem].text,
-            result: this.data[this.activeItem].result
+            result: this.data[this.activeItem].result,
+            status: this.data[this.activeItem].status,
           },
           headers: {
             'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
@@ -186,7 +206,6 @@ export default {
         this.isBusy = false
         this.alertContent = '保存成功!'
         this.dismissCountDown = 1
-
       })
     },
     activeItem_minus() {
