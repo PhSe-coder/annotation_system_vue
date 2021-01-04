@@ -43,7 +43,6 @@ export default {
   watch: {
     result: {
       handler: function (newValue) {
-        console.log(newValue)
         this.setTags(newValue)
       },
     }
@@ -72,7 +71,6 @@ export default {
             if ((start >= item[2] && start < item[3]) || (end > item[2] && end <= item[3]) || (start <= item[2] && end >= item[3]))
               isValid = false
           }
-          console.log(isValid)
           if (isValid) {
             this.$store.commit('setSelected', {start:start, end:end, text:range.toString()})
           }
