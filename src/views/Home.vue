@@ -20,10 +20,11 @@ export default {
         url: '/api/user/is_authenticated/',
       }
     }).then(res => {
-      if (!res.data['is_superuser'])
+      if (!res.data['is_superuser']){
         next(vm => {
           vm.$store.commit('setName', res.data['username'])
         })
+      }
       else {
         alert('权限不足')
         next({name: 'Login', replace: true})

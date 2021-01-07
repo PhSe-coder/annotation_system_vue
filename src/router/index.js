@@ -28,20 +28,19 @@ const routes = [
       {
         path: '/project',
         component: Project,
-        children:[
+        children: [
           {
             path: '',
-            name:'project_edit',
+            name: 'project_edit',
             component: () => import(/* webpackChunkName: "project_edit" */ '../components/Home/ProjectEdit'),
           },
           {
             path: '/tag_manage',
-            name:'tag_manage',
+            name: 'tag_manage',
             component: () => import(/* webpackChunkName: "tag_manage" */ '../components/Home/TagManage'),
           },
         ]
       },
-
     ]
   },
   {
@@ -87,8 +86,10 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if(!Vue.$cookies.get('sessionid') && to.name !=='Login'){
-     next({name:'Login'})
+  if(to.meta.auth && !Vue.$cookies.get('sessionid')){
+     next({
+       name:'Login',
+     })
   }
   if(!Vue.$cookies.get('csrftoken')){
     request({
@@ -98,6 +99,22 @@ router.beforeEach((to, from, next) => {
       }
     })
   }
-  next()
+
+  request({
+    config: {
+      method: 'get',
+      url: '/api/user/is_authenticated/',
+    }
+  }).then(res => {
+    if (!res.data['is_superuser']){
+      next(vm => {
+        vm.$store.commit('setName', res.data['username'])
+      })
+    }
+    else {
+      alert('权限不足')
+      next({name: 'Login', replace: true})
+    }
+  })
 })
 export default router

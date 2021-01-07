@@ -65,10 +65,13 @@ export default {
         let result = res.data
         this.waiting = false
         if (result.status === 'success') {
-          if(!result['is_superuser'])
+          if(!result['is_superuser']){
             this.$router.replace({name: 'Home',})
-          else
+          }
+          else{
             this.$router.replace({name: 'admin_project',})
+          }
+
         } else {
           alert('用户名或密码不正确')
         }
@@ -88,7 +91,7 @@ export default {
     }
   },
   beforeRouteEnter: (to, from, next) => {
-    if (!Vue.$cookies.get('sessionid')) {
+    if (!Vue.$cookies.get('sessionid') && to.name !=='Login') {
       next()
       return
     }
