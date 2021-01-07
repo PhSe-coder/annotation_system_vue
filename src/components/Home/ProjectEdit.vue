@@ -13,11 +13,11 @@
           <template #cell(text)="data">
             <b-list-group-item href="javascript:void(0)" @click="setActive($event, data.index)"
                                :class="{active: data.index + (currentPage-1)*perPage === activeItem}">
-              <small>{{ data.item.text }}</small>
+              <small class="item-overview">{{ data.item.text }}</small>
               <div class="d-flex justify-content-between align-items-center">
                   <span>
                     <span v-for="(value,i) in data.item['annotator_status']">
-                      <b-icon v-if="value.status === 1" style="vertical-align: text-bottom"
+                      <b-icon v-if="value.status === true" style="vertical-align: text-bottom"
                               icon="check-square"
                               variant="success" font-scale="1"></b-icon>
                       <b-icon v-else icon="x-square" style="vertical-align: text-bottom" variant="danger"
@@ -60,10 +60,10 @@
               <b-button @click="annotate" size="lg" class="mx-2" variant="info">
               <b-icon icon="record-circle"></b-icon>
             </b-button>
-              <b-button @click="save_annotate($event,0)" size="lg" class="mx-2" variant="danger">
+              <b-button @click="save_annotate($event,false)" size="lg" class="mx-2" variant="danger">
               <b-icon icon="x"></b-icon>
             </b-button>
-              <b-button @click="save_annotate($event,1)" size="lg" class="mx-2" variant="success">
+              <b-button @click="save_annotate($event,true)" size="lg" class="mx-2" variant="success">
               <b-icon icon="check"></b-icon>
             </b-button>
             </span>
@@ -133,12 +133,17 @@ export default {
       alertType: 'success'
     }
   },
+  watch:{
+    activeItem(newValue,oldVale){
+      this.currentPage = Math.floor(newValue / this.perPage + 1)
+    }
+  },
   methods: {
     countDownChanged(dismissCountDown) {
       this.dismissCountDown = dismissCountDown
     },
     setActive(e, index) {
-      this.activeItem = index
+      this.activeItem = index + (this.currentPage-1)*this.perPage
     },
     annotate() {
       this.isBusy = true
@@ -167,19 +172,11 @@ export default {
         this.alertContent = '标注超时！'
       })
     },
-    delete_annotate() {
-      let index = this.data[this.activeItem].annotator_status.findIndex(value => {
-        return value.annotator === this.$store.state.username
-      })
-      this.data[this.activeItem].status[index] = 0
-      let length = this.data[this.activeItem].result.length
-      this.data[this.activeItem].result.splice(0, length)
-    },
     save_annotate(ev, status) {
       let index = this.data[this.activeItem].annotator_status.findIndex(value => {
         return value.annotator === this.$store.state.username
       })
-      if(status === 0){
+      if(status === false){
         let result = window.confirm('是否清除所有标注项！\n（注：该操作将同步到服务器）')
         if(result){
           let length = this.data[this.activeItem].result.length
@@ -190,6 +187,7 @@ export default {
       }
       this.data[this.activeItem].annotator_status[index].status = status
       this.isBusy = true
+      let id = index+1
       request({
         config: {
           url: 'api/annotation_task/save_annotate/',
@@ -198,6 +196,8 @@ export default {
             project_name: this.$route.query.id,
             text: this.data[this.activeItem].text,
             result: this.data[this.activeItem].result,
+            annotator: 'annotator_status_'+id,
+            status:status
           },
           headers: {
             'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
@@ -207,15 +207,14 @@ export default {
         this.isBusy = false
         this.alertContent = '保存成功!'
         this.dismissCountDown = 1
+        if(status) this.activeItem_add()
       })
     },
     activeItem_minus() {
       this.activeItem > 0 ? this.activeItem-- : this.activeItem
-      this.currentPage = Math.floor(this.activeItem / this.perPage + 1)
     },
     activeItem_add() {
       this.activeItem < this.data.length - 1 ? this.activeItem++ : this.activeItem
-      this.currentPage = Math.floor(this.activeItem / this.perPage + 1)
     },
   },
   beforeRouteEnter: (to, from, next) => {
@@ -273,7 +272,7 @@ export default {
 </script>
 
 <style scoped>
-p {
+.item-overview {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
