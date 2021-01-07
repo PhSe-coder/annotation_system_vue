@@ -16,13 +16,13 @@
               <small>{{ data.item.text }}</small>
               <div class="d-flex justify-content-between align-items-center">
                   <span>
-                    <span v-for="(value,i) in data.item.annotators">
-                      <b-icon v-if="data.item.status[i] === 1" style="vertical-align: text-bottom"
+                    <span v-for="(value,i) in data.item['annotator_status']">
+                      <b-icon v-if="value.status === 1" style="vertical-align: text-bottom"
                               icon="check-square"
                               variant="success" font-scale="1"></b-icon>
                       <b-icon v-else icon="x-square" style="vertical-align: text-bottom" variant="danger"
                               font-scale="1"></b-icon>
-                      <small class="ml-2">{{ value }} </small>
+                      <small class="ml-2">{{ value.annotator }} </small>
                     </span>
                   </span>
                 <small class="font-weight-bold">3 days ago</small>
@@ -168,16 +168,16 @@ export default {
       })
     },
     delete_annotate() {
-      let index = this.data[this.activeItem].annotators.findIndex(value => {
-        return value === this.$store.state.username
+      let index = this.data[this.activeItem].annotator_status.findIndex(value => {
+        return value.annotator === this.$store.state.username
       })
       this.data[this.activeItem].status[index] = 0
       let length = this.data[this.activeItem].result.length
       this.data[this.activeItem].result.splice(0, length)
     },
     save_annotate(ev, status) {
-      let index = this.data[this.activeItem].annotators.findIndex(value => {
-        return value === this.$store.state.username
+      let index = this.data[this.activeItem].annotator_status.findIndex(value => {
+        return value.annotator === this.$store.state.username
       })
       if(status === 0){
         let result = window.confirm('是否清除所有标注项！\n（注：该操作将同步到服务器）')
@@ -188,7 +188,7 @@ export default {
           return
         }
       }
-      this.data[this.activeItem].status[index] = status
+      this.data[this.activeItem].annotator_status[index].status = status
       this.isBusy = true
       request({
         config: {
@@ -198,7 +198,6 @@ export default {
             project_name: this.$route.query.id,
             text: this.data[this.activeItem].text,
             result: this.data[this.activeItem].result,
-            status: this.data[this.activeItem].status,
           },
           headers: {
             'X-XSRF-TOKEN': this.$cookies.get('csrftoken')

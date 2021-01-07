@@ -7,19 +7,23 @@
           <template #button-content>
             <i class="fa fa-cog"></i>
           </template>
-          <b-dropdown-item>
+          <b-dropdown-item @click="editProject($event, name)">
             <i class="fa fa-pencil-square mr-1" aria-hidden="true"></i>Edit
           </b-dropdown-item>
-          <b-dropdown-item @click="$bvModal.show('modal'+name)">
+          <b-dropdown-item @click="$bvModal.show('modal_delete'+name)">
             <i class="fa fa-trash mr-1" aria-hidden="true"></i>Delete
           </b-dropdown-item>
         </b-dropdown>
-        <b-modal :id="'modal'+name" title="警告" size="sm" @ok="deleteProject($event,name)">
+        <b-modal :id="'modal_delete'+name" title="警告" size="sm" @ok="deleteProject($event,name)">
           是否删除该项目
+        </b-modal>
+        <b-modal hide-footer hide-header :id="'modal_edit'+name" aria-label="项目编辑">
+          <create-project title="更新项目" :type="type" :name="name" :members="members"
+                          :description="description" :is-disabled="true"></create-project>
         </b-modal>
       </div>
       <div class="card-body text-muted">
-        <span v-if="progress.toFixed() === '100'" class="badge badge-success">Finished</span>
+        <span v-if="task_progress === 100" class="badge badge-success">Finished</span>
         <span v-else class="badge badge-secondary">Ongoing</span>
         <div class="row mb-3 mt-2">
           <div class="col-3">
@@ -29,7 +33,7 @@
           </div>
           <div class="col-4">
             <i class="fa fa-users mr-1" aria-hidden="true"></i>
-            <b>{{ members }}</b>
+            <b>{{ members.length }}</b>
             Members
           </div>
           <div class="col-5">
@@ -60,14 +64,18 @@
 <script>
 import {request} from "../../network/request";
 import bus from "../bus";
+import CreateProject from "./CreateProject";
 
 export default {
   name: "ProjectItem",
-  computed:{
-    task_progress(){
-      console.log(this.progress.toFixed(2)*100)
-      return this.progress.toFixed(2)*100
+  computed: {
+    task_progress() {
+      console.log(this.progress.toFixed(2) * 100)
+      return this.progress.toFixed(2) * 100
     }
+  },
+  components: {
+    CreateProject
   },
   props: {
     name: {
@@ -86,8 +94,8 @@ export default {
       required: true
     },
     members: {
-      type: Number,
-      default: 3,
+      type: Array,
+      default: [],
       required: true
     },
     description: {
@@ -99,9 +107,17 @@ export default {
       type: Number,
       default: 0,
       required: true
+    },
+    users: {
+      type: Array,
+      default: [],
+      required: true
     }
   },
   methods: {
+    editProject(e, name) {
+      this.$bvModal.show('modal_edit' + name)
+    },
     deleteProject(e, name) {
       console.log(name)
       request({

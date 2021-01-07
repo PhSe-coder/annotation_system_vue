@@ -4,7 +4,7 @@
       <project-item v-for="item in projectInfo_item" :key="item['project_name']" class="col-6"
                     :description="item['project_description']" :name="item['project_name']"
                     :type="item['project_type']" :tasks="item['count']"
-                    :members="item['project_members']" :progress="item['project_progress']"></project-item>
+                    :members="item['project_members']" :progress="item['project_progress']" :users="usernames"></project-item>
     </div>
   </div>
 </template>
@@ -19,7 +19,8 @@ export default {
   name: "ProjectList",
   data() {
     return {
-      projectInfo: []
+      projectInfo: [],
+      usernames:[]
     }
   },
   components: {
@@ -43,6 +44,18 @@ export default {
     this.get_project_list()
     bus.$on("update_project", () => {
       this.get_project_list()
+    })
+    request({
+      config:{
+        url:'api/user/get_username/',
+        method:'post',
+        headers:{
+          'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
+        }
+      }
+    }).then(res => {
+      console.log(res.data)
+      this.usernames = res.data
     })
   },
 

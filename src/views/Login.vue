@@ -102,7 +102,7 @@ export default {
         next()
       } else {
         if(res.data['is_superuser'])
-          next({name: 'Admin', replace: true})
+          next({name: 'admin_project', replace: true})
         else
           next({name: 'Home', replace: true})
       }
