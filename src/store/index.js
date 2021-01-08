@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     username: '',
+    selectedIsValid:false,
     selected:{
       start: 0,
       end: 0,
@@ -15,6 +16,9 @@ export default new Vuex.Store({
   mutations: {
     setName(state, name) {
       state.username = name
+    },
+    setSelectedIsValid(state, isValid) {
+      state.selectedIsValid = isValid
     },
     setSelected(state, selected) {
       state.selected = selected

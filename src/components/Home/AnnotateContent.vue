@@ -71,6 +71,7 @@ export default {
             if ((start >= item[2] && start < item[3]) || (end > item[2] && end <= item[3]) || (start <= item[2] && end >= item[3]))
               isValid = false
           }
+          this.$store.commit('setSelectedIsValid', isValid)
           if (isValid) {
             this.$store.commit('setSelected', {start:start, end:end, text:range.toString()})
           }

@@ -252,7 +252,7 @@ export default {
       } else if (this.tags.findIndex( value => {
         tagType = value.type
         return value.keyChar === keyChar
-      }) !== -1) {
+      }) !== -1 && this.$store.state.selectedIsValid) {
         let selected = this.$store.state.selected
         let index = this.data[this.activeItem].result.findIndex(value => {
           return selected.start < value[2]
@@ -260,6 +260,7 @@ export default {
         if(index === -1)
           index = this.data[this.activeItem].result.length
         this.data[this.activeItem].result.splice(index, 0, [selected.text, tagType, selected.start, selected.end])
+        this.$store.commit('setSelectedIsValid', false)
         window.getSelection().empty()
       }
     })
