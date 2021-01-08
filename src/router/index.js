@@ -86,7 +86,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if(to.meta.auth && !Vue.$cookies.get('sessionid')){
+  if(!Vue.$cookies.get('sessionid') && to.name !== 'Login'){
      next({
        name:'Login',
      })
@@ -99,22 +99,6 @@ router.beforeEach((to, from, next) => {
       }
     })
   }
-
-  request({
-    config: {
-      method: 'get',
-      url: '/api/user/is_authenticated/',
-    }
-  }).then(res => {
-    if (!res.data['is_superuser']){
-      next(vm => {
-        vm.$store.commit('setName', res.data['username'])
-      })
-    }
-    else {
-      alert('权限不足')
-      next({name: 'Login', replace: true})
-    }
-  })
+  next()
 })
 export default router

@@ -51,7 +51,8 @@ export default {
     request({
       config: {
         url: 'api/user/get_userinfo/',
-        method: 'get'
+        method: 'get',
+        timeout:10000,
       }
     }).then(res => {
       this.items = res.data

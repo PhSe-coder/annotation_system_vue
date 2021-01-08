@@ -48,7 +48,7 @@ export default {
     }
   },
   methods: {
-    setTags(Data) {
+    setTags: function (Data) {
       let tag = document.createElement('p')
       tag.style.lineHeight = '2'
       tag.id = 'content'
@@ -73,7 +73,7 @@ export default {
           }
           this.$store.commit('setSelectedIsValid', isValid)
           if (isValid) {
-            this.$store.commit('setSelected', {start:start, end:end, text:range.toString()})
+            this.$store.commit('setSelected', {start: start, end: end, text: range.toString()})
           }
         }
       }

@@ -91,7 +91,7 @@ export default {
     }
   },
   beforeRouteEnter: (to, from, next) => {
-    if (!Vue.$cookies.get('sessionid') && to.name !=='Login') {
+    if (!Vue.$cookies.get('sessionid')) {
       next()
       return
     }
