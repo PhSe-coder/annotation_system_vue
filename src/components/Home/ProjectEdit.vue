@@ -13,7 +13,7 @@
           <template #cell(text)="data">
             <b-list-group-item href="javascript:void(0)" @click="setActive($event, data.index)"
                                :class="{active: data.index + (currentPage-1)*perPage === activeItem}">
-              <small class="item-overview">{{ data.item.text }}</small>
+              <small :title="data.item.text" class="item-overview">{{ data.item.text }}</small>
               <div class="d-flex justify-content-between align-items-center">
                   <span>
                     <span v-for="(value,i) in data.item['annotator_status']">
@@ -53,21 +53,21 @@
                :text="data[activeItem].text"></tag>
         </div>
         <div class="d-flex justify-content-between align-items-md-baseline" style="height: 25%">
-          <b-button @click="activeItem_minus" size="lg" class="mx-2" variant="secondary">
+          <b-button title="前一项" @click="activeItem_minus" size="lg" class="mx-2" variant="secondary">
             <b-icon icon="arrow-left-circle"></b-icon>
           </b-button>
           <span>
-              <b-button @click="annotate" size="lg" class="mx-2" variant="info">
+              <b-button title="算法预标注" @click="annotate" size="lg" class="mx-2" variant="info">
               <b-icon icon="record-circle"></b-icon>
             </b-button>
-              <b-button @click="save_annotate($event,false)" size="lg" class="mx-2" variant="danger">
+              <b-button title="删除当前项所有的标注内容" @click="save_annotate(false)" size="lg" class="mx-2" variant="danger">
               <b-icon icon="x"></b-icon>
             </b-button>
-              <b-button @click="save_annotate($event,true)" size="lg" class="mx-2" variant="success">
+              <b-button title="保存标注结果" @click="save_annotate(true)" size="lg" class="mx-2" variant="success">
               <b-icon icon="check"></b-icon>
             </b-button>
             </span>
-          <b-button @click="activeItem_add" size="lg" class="mx-2" variant="secondary">
+          <b-button title="后一项" @click="activeItem_add" size="lg" class="mx-2" variant="secondary">
             <b-icon icon="arrow-right-circle"></b-icon>
           </b-button>
         </div>
@@ -172,7 +172,7 @@ export default {
         this.alertContent = '标注超时！'
       })
     },
-    save_annotate(ev, status) {
+    save_annotate(status) {
       let index = this.data[this.activeItem].annotator_status.findIndex(value => {
         return value.annotator === this.$store.state.username
       })
@@ -249,6 +249,9 @@ export default {
         this.activeItem_minus()
       } else if (keyCode === 39 || keyCode === 40) {
         this.activeItem_add()
+      } else if (keyCode === 13) {
+        e.preventDefault()
+        this.save_annotate(true)
       } else if (this.tags.findIndex( value => {
         tagType = value.type
         return value.keyChar === keyChar
