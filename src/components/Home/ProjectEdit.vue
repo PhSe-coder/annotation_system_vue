@@ -1,11 +1,5 @@
 <template>
   <main class="container mt-3">
-    <div class="annotation_alert">
-      <b-alert :show="dismissCountDown" fade :variant="alertType" @dismiss-count-down="countDownChanged">
-        <b-icon icon="exclamation-triangle"></b-icon>
-        {{ alertContent }}
-      </b-alert>
-    </div>
     <div class="row">
       <div class="col-4">
         <b-table table-class="item-table" borderless thead-class="d-none" :items="data" :fields="field"
@@ -80,6 +74,7 @@
 import {request} from "../../network/request";
 import Tag from "./AnnotateContent";
 import bus from "../bus";
+import {createAlert} from "../../script/alert";
 
 export default {
   name: "ProjectEdit",
@@ -128,9 +123,6 @@ export default {
           keyChar: 'z'
         },
       ],
-      dismissCountDown: 0,
-      alertContent: '保存成功!',
-      alertType: 'success'
     }
   },
   watch:{
@@ -139,9 +131,6 @@ export default {
     }
   },
   methods: {
-    countDownChanged(dismissCountDown) {
-      this.dismissCountDown = dismissCountDown
-    },
     setActive(e, index) {
       this.activeItem = index + (this.currentPage-1)*this.perPage
     },
@@ -161,15 +150,11 @@ export default {
         }
       }).then(res => {
         this.isBusy = false
-        this.dismissCountDown = 1
-        this.alertType = 'success'
-        this.alertContent = '预标注成功！'
+        createAlert({alertType:'success',alertContent:'预标注成功！'})
         bus.$emit('annotate', res.data)
       },error => {
         console.log(error)
-        this.dismissCountDown = 1
-        this.alertType = 'danger'
-        this.alertContent = '标注超时！'
+        createAlert({alertType:'danger',alertContent:'标注超时！'})
       })
     },
     save_annotate(status) {
@@ -205,8 +190,7 @@ export default {
         }
       }).then(res => {
         this.isBusy = false
-        this.alertContent = '保存成功!'
-        this.dismissCountDown = 1
+        createAlert({alertType:'success',alertContent:'保存成功！'})
         if(status) this.activeItem_add()
       })
     },
@@ -308,12 +292,5 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-}
-
-.annotation_alert {
-  position: absolute;
-  top: 2%;
-  left: 50%;
-  transform: translate(-50%, 0);
 }
 </style>

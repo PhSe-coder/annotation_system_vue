@@ -14,6 +14,12 @@
           <span >成员概览</span>
         </router-link>
       </li>
+      <li class="nav-item">
+        <router-link class="nav-link" :to="{name:'admin_tag_manager'}">
+          <i class="fa fa-tag col-3" aria-hidden="true"></i>
+          <span >标签管理</span>
+        </router-link>
+      </li>
 <!--      <li class="nav-item">-->
 <!--        <a class="nav-link" href="#collapseMenu" aria-controls="collapseMenu" role="button" data-toggle="collapse"-->
 <!--           aria-expanded="false">-->
@@ -62,7 +68,7 @@ export default {
 #nav a{
   transition: color 300ms ease-in-out;
 }
-#nav a.router-link-exact-active {
+#nav a.router-link-active {
   color: white;
 }
 </style>

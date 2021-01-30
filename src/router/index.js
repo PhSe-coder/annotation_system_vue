@@ -51,20 +51,25 @@ const routes = [
     component: () => import(/* webpackChunkName: "admin" */ '../views/Admin.vue'),
     children: [
       {
-        path: '',
+        path: '/admin/index',
         name: 'admin_project',
         component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/Project.vue' ),
       },
       {
-        path: '/create_project',
+        path: '/admin/create_project',
         name: 'admin_create_project',
         component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/CreateProject.vue' )
       },
       {
-        path: '/users',
+        path: '/admin/users',
         name: 'admin_users',
         component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/ProjectUsers.vue' )
       },
+      {
+        path: '/admin/tags',
+        name: 'admin_tag_manager',
+        component: () => import(/* webpackChunkName: 'admin_home' */ '../components/admin/TagManager.vue' )
+      }
     ]
   },
   {
