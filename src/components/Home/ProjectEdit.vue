@@ -27,15 +27,16 @@
         <b-pagination class="mt-3" v-model="currentPage" :total-rows="data.length" :per-page="perPage"
                       align="center"></b-pagination>
       </div>
-      <div class="col-8" id="annotation_content">
-        <div class="d-flex bg-info my-2 py-2 pl-2">
-          <b-badge v-for="tag in tags" :key="tag.tagKey" class="mr-2" :style="tag.style">{{ tag.tag }}
+      <div class="col-8">
+        <div class="badge-parent bg-info pl-1">
+          <b-icon-three-dots class="dot" v-if="childHeight !== parentHeight" @click="dropdown"></b-icon-three-dots>
+          <b-badge v-for="tag in tags" :title="tag.tagName" :key="tag.tagKey" class="badge-child" :style="tag.style">{{ tag.tag }}
             <b-badge variant="light" class="ml-2">
               {{ tag.tagKey }}
             </b-badge>
           </b-badge>
         </div>
-        <div class="container pt-2 tab_content" style="height: 65%;position: relative;">
+        <div class="container pt-2 tab-content">
           <div v-if="isBusy">
             <div class="mask"></div>
             <div class="spinner">
@@ -43,7 +44,7 @@
                          label="Large Spinner"></b-spinner>
             </div>
           </div>
-          <tag v-if="data[activeItem]" :key="activeItem" :tags="tags" :result="data[activeItem].result"
+          <tag v-if="data[activeItem] && tags.length !== 0" :key="activeItem" :tags="tags" :result="data[activeItem].result"
                :text="data[activeItem].text"></tag>
         </div>
         <div class="d-flex justify-content-between align-items-md-baseline" style="height: 25%">
@@ -75,7 +76,6 @@ import {request} from "../../network/request";
 import Tag from "./AnnotateContent";
 import bus from "../bus";
 import {createAlert} from "../../script/alert";
-
 export default {
   name: "ProjectEdit",
   components: {Tag},
@@ -90,53 +90,48 @@ export default {
         {key: 'text', class: 'p-0'}
       ],
       tags: [
-        {
-          style: {
-            backgroundColor: '#fecfdf',
-            color: '#000000',
-          },
-          tag: 'NR',
-          tagKey: 'r'
-        },
-        {
-          style: {
-            backgroundColor: '#30309D',
-            color: '#ffffff',
-          },
-          tag: 'NS',
-          tagKey: 's'
-        },
-        {
-          style: {
-            backgroundColor: '#297029',
-            color: '#ffffff',
-          },
-          tag: 'NT',
-          tagKey: 't'
-        },
-        {
-          style: {
-            backgroundColor: '#FF0000',
-            color: '#ffffff',
-          },
-          tag: 'NZ',
-          tagKey: 'z'
-        },
+        // {
+        //   style: {
+        //     backgroundColor: '#fecfdf',
+        //     color: '#000000',
+        //   },
+        //   tag: 'NR',
+        //   tagKey: 'r'
+        // },
+        // {
+        //   style: {
+        //     backgroundColor: '#30309D',
+        //     color: '#ffffff',
+        //   },
+        //   tag: 'NS',
+        //   tagKey: 's'
+        // },
+        // {
+        //   style: {
+        //     backgroundColor: '#297029',
+        //     color: '#ffffff',
+        //   },
+        //   tag: 'NT',
+        //   tagKey: 't'
+        // },
       ],
+      childHeight:0,
+      parentHeight:0,
     }
   },
-  watch:{
-    activeItem(newValue,oldVale){
+  watch: {
+    activeItem(newValue, oldVale) {
       this.currentPage = Math.floor(newValue / this.perPage + 1)
     }
   },
   methods: {
     setActive(e, index) {
-      this.activeItem = index + (this.currentPage-1)*this.perPage
+      this.activeItem = index + (this.currentPage - 1) * this.perPage
     },
     annotate() {
       this.isBusy = true
       let formData = new FormData()
+      formData.append('type', this.$store.state.tagInfo.project_type)
       formData.append('text', this.data[this.activeItem].text)
       request({
         config: {
@@ -150,31 +145,33 @@ export default {
         }
       }).then(res => {
         this.isBusy = false
-        if(res.status === 200){
-          createAlert({alertType:'success',alertContent:'预标注成功！'})
+        if (res.status === 200) {
+          createAlert({alertType: 'success', alertContent: '预标注成功！'})
           bus.$emit('annotate', res.data)
+        }else{
+          createAlert({alertType: 'danger', alertContent: '标注失败！'})
         }
-      },error => {
-        console.log(error)
-        createAlert({alertType:'danger',alertContent:'标注超时！'})
+      }, error => {
+        this.isBusy = false
+        createAlert({alertType: 'danger', alertContent: '标注超时！'})
       })
     },
     save_annotate(status) {
       let index = this.data[this.activeItem].annotator_status.findIndex(value => {
         return value.annotator === this.$store.state.username
       })
-      if(status === false){
+      if (status === false) {
         let result = window.confirm('是否清除所有标注项！\n（注：该操作将同步到服务器）')
-        if(result){
+        if (result) {
           let length = this.data[this.activeItem].result.length
           this.data[this.activeItem].result.splice(0, length)
-        }else{
+        } else {
           return
         }
       }
       this.data[this.activeItem].annotator_status[index].status = status
       this.isBusy = true
-      let id = index+1
+      let id = index + 1
       request({
         config: {
           url: 'api/annotation_task/save_annotate/',
@@ -183,8 +180,8 @@ export default {
             project_name: this.$route.query.id,
             text: this.data[this.activeItem].text,
             result: this.data[this.activeItem].result,
-            annotator: 'annotator_status_'+id,
-            status:status
+            annotator: 'annotator_status_' + id,
+            status: status
           },
           headers: {
             'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
@@ -192,8 +189,8 @@ export default {
         }
       }).then(res => {
         this.isBusy = false
-        createAlert({alertType:'success',alertContent:'保存成功！'})
-        if(status) this.activeItem_add()
+        createAlert({alertType: 'success', alertContent: '保存成功！'})
+        if (status) this.activeItem_add()
       })
     },
     activeItem_minus() {
@@ -201,6 +198,22 @@ export default {
     },
     activeItem_add() {
       this.activeItem < this.data.length - 1 ? this.activeItem++ : this.activeItem
+    },
+    dropdown(){
+      let parent_ele = $('.badge-parent')
+      let child_ele = $('.badge-child')
+      let tab_content = $('.tab-content')
+      console.log(tab_content.parent().height());
+      let height = child_ele[0].clientHeight + 2 * parseInt(child_ele.css('margin'))
+      let tab_contentHeight = (tab_content.height()-(parent_ele[0].scrollHeight-parent_ele.height()))
+      console.log(tab_contentHeight/tab_content.parent().height())
+      if(parent_ele.height() !== parent_ele[0].scrollHeight){
+        tab_content.css('height', tab_contentHeight/tab_content.parent().height()*100 + '%')
+        parent_ele.css('height', parent_ele[0].scrollHeight)
+      } else{
+        parent_ele.css('height', height)
+        tab_content.css('height', '65%' )
+      }
     },
   },
   beforeRouteEnter: (to, from, next) => {
@@ -238,7 +251,7 @@ export default {
       } else if (keyCode === 13) {
         e.preventDefault()
         this.save_annotate(true)
-      } else if (this.tags.findIndex( value => {
+      } else if (this.tags.findIndex(value => {
         tagType = value.tag
         return value.tagKey === keyChar
       }) !== -1 && this.$store.state.selectedIsValid) {
@@ -246,7 +259,7 @@ export default {
         let index = this.data[this.activeItem].result.findIndex(value => {
           return selected.start < value[2]
         })
-        if(index === -1)
+        if (index === -1)
           index = this.data[this.activeItem].result.length
         this.data[this.activeItem].result.splice(index, 0, [selected.text, tagType, selected.start, selected.end])
         this.$store.commit('setSelectedIsValid', false)
@@ -256,18 +269,34 @@ export default {
     bus.$on('update_annotate', (annotate_result) => {
       this.$set(this.data[this.activeItem], 'result', annotate_result)
     })
-    request({
-      config:{
-        url:'api/tag_manager/get_tags',
-        method:'get',
-        params:{
-          tagType:this.$store.state.tagInfo.type
+  },
+  mounted() {
+    bus.$on('get_tags',()=>{
+      request({
+        config: {
+          url: 'api/tag_manager/get_tags',
+          method: 'get',
+          params: {
+            tagType: this.$store.state.tagInfo.project_type
+          }
         }
-      }
-    }).then(res => {
-      this.tags = res.data[this.$store.state.tagInfo.type]
+      }).then(res => {
+        this.tags = res.data[this.$store.state.tagInfo.project_type]
+        console.log(this.tags)
+        this.$nextTick(()=>{
+          let child_ele = $('.badge-child')
+          let parent_ele = $('.badge-parent')
+          parent_ele.css('height', child_ele[0].clientHeight + 2 * parseInt(child_ele.css('margin')))
+          this.childHeight = child_ele[0].clientHeight + 2 * parseInt(child_ele.css('margin'))
+          this.parentHeight = parent_ele[0].scrollHeight
+        })
+      })
     })
   },
+  // 销毁时清除事件，否则会导致事件在单次emit后被执行多次
+  beforeDestroy() {
+    bus.$off('get_tags')
+  }
 }
 
 </script>
@@ -280,8 +309,12 @@ export default {
   overflow: hidden;
 }
 
-.tab_content {
+.tab-content {
+  position: relative;
+  height: 65%;
+  min-height: 40%;
   box-shadow: 0 0 5px #888888;
+  transition: height 0.6s ease-in-out;
 }
 
 .item-table {
@@ -305,5 +338,27 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
+}
+
+.badge-parent {
+  position: relative;
+  display: flex;
+  flex-wrap:wrap;
+  overflow: hidden;
+  height: unset;
+  transition: height 0.6s ease-in-out;
+}
+.badge-child {
+  width: 8%;
+  margin: 0.25rem;
+}
+
+.dot {
+  position: absolute;
+  cursor: pointer;
+  color: white;
+  top: 50%;
+  right: 1%;
+  transform: translate(0, -50%);
 }
 </style>

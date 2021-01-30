@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <keep-alive>
-      <router-view/>
-    </keep-alive>
-  </div>
+  <router-view/>
 </template>
 
 <script>

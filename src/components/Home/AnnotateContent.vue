@@ -36,9 +36,9 @@ export default {
     })
   },
   mounted() {
-    if (this.result.length !== 0) {
+    this.$nextTick(()=>{
       this.setTags(this.result)
-    }
+    })
   },
   watch: {
     result: {
@@ -84,9 +84,12 @@ export default {
         let result = this.tags.find(value => {
           return value.tag === datum[1]
         })
+        if(result === undefined)
+          console.log(this.tags)
         let MyComponent = Vue.extend({
+          name:'badgeCpn',
           // template不能换行，换行会有bug，会导致鼠标选中的文本的位置不对！
-          template: "<b-badge style='font-size: inherit; font-weight: normal' :style='result.style'>{{ datum }}<b-avatar class='ml-1' button icon='x' variant='light' @click='deleteTag' :size='16'></b-avatar></b-badge>",
+          template: "<b-badge :title='result.tagName' style='font-size: inherit; font-weight: normal' :style='result.style'>{{ datum }}<b-avatar class='ml-1' button icon='x' variant='light' @click='deleteTag' :size='16'></b-avatar></b-badge>",
           // template: `
           //   <b-badge style="font-size: inherit; font-weight: normal" :style="result.style">{{ datum }}
           //   <b-avatar  button icon="x" variant="light" @click="deleteTag" :size="16"></b-avatar>

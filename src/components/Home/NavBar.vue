@@ -28,6 +28,7 @@
 
 <script>
 import {request} from "../../network/request";
+import bus from "../bus";
 
 export default {
   name: "NavBar",
@@ -37,20 +38,27 @@ export default {
     }
   },
   activated() {
-    request({
-      config: {
-        url: 'api/annotation_task/get_project_overview/',
-        method: 'get',
-        params: {
-          id: this.$route.query.id
-        }
-      }
-    }).then(res => {
-      this.project_info = res.data
-      this.$store.commit('setTagInfo',{type:this.project_info.project_type})
-    })
+    this.get_project_overview()
+  },
+  created() {
+    this.get_project_overview()
   },
   methods: {
+    get_project_overview() {
+      request({
+        config: {
+          url: 'api/annotation_task/get_project_overview/',
+          method: 'get',
+          params: {
+            id: this.$route.query.id
+          }
+        }
+      }).then(res => {
+        this.project_info = res.data
+        this.$store.commit('setTagInfo', this.project_info)
+        bus.$emit('get_tags')
+      })
+    },
     logout() {
       request({
         config: {

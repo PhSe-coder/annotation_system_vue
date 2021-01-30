@@ -34,11 +34,6 @@ const routes = [
             name: 'project_edit',
             component: () => import(/* webpackChunkName: "project_edit" */ '../components/Home/ProjectEdit'),
           },
-          {
-            path: '/tag_manage',
-            name: 'tag_manage',
-            component: () => import(/* webpackChunkName: "tag_manage" */ '../components/Home/TagManage'),
-          },
         ]
       },
     ]

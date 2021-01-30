@@ -13,7 +13,7 @@ export default new Vuex.Store({
       text:''
     },
     tagInfo:{
-      type:'NER'
+
     }
   },
   mutations: {
