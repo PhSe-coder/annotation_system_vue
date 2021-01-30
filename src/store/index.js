@@ -11,6 +11,9 @@ export default new Vuex.Store({
       start: 0,
       end: 0,
       text:''
+    },
+    tagInfo:{
+      type:'NER'
     }
   },
   mutations: {
@@ -22,6 +25,9 @@ export default new Vuex.Store({
     },
     setSelected(state, selected) {
       state.selected = selected
+    },
+    setTagInfo(state, tagInfo){
+      state.tagInfo = tagInfo
     }
   },
   actions: {},

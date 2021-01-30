@@ -9,7 +9,7 @@
                                :class="{active: data.index + (currentPage-1)*perPage === activeItem}">
               <small :title="data.item.text" class="item-overview">{{ data.item.text }}</small>
               <div class="d-flex justify-content-between align-items-center">
-                  <span>
+                <span>
                     <span v-for="(value,i) in data.item['annotator_status']">
                       <b-icon v-if="value.status === true" style="vertical-align: text-bottom"
                               icon="check-square"
@@ -29,9 +29,9 @@
       </div>
       <div class="col-8" id="annotation_content">
         <div class="d-flex bg-info my-2 py-2 pl-2">
-          <b-badge v-for="tag in tags" :key="tag.keyChar" class="mr-2" :style="tag.style">{{ tag.type }}
+          <b-badge v-for="tag in tags" :key="tag.tagKey" class="mr-2" :style="tag.style">{{ tag.tag }}
             <b-badge variant="light" class="ml-2">
-              {{ tag.keyChar }}
+              {{ tag.tagKey }}
             </b-badge>
           </b-badge>
         </div>
@@ -95,32 +95,32 @@ export default {
             backgroundColor: '#fecfdf',
             color: '#000000',
           },
-          type: 'NR',
-          keyChar: 'r'
+          tag: 'NR',
+          tagKey: 'r'
         },
         {
           style: {
             backgroundColor: '#30309D',
             color: '#ffffff',
           },
-          type: 'NS',
-          keyChar: 's'
+          tag: 'NS',
+          tagKey: 's'
         },
         {
           style: {
             backgroundColor: '#297029',
             color: '#ffffff',
           },
-          type: 'NT',
-          keyChar: 't'
+          tag: 'NT',
+          tagKey: 't'
         },
         {
           style: {
             backgroundColor: '#FF0000',
             color: '#ffffff',
           },
-          type: 'NZ',
-          keyChar: 'z'
+          tag: 'NZ',
+          tagKey: 'z'
         },
       ],
     }
@@ -150,8 +150,10 @@ export default {
         }
       }).then(res => {
         this.isBusy = false
-        createAlert({alertType:'success',alertContent:'预标注成功！'})
-        bus.$emit('annotate', res.data)
+        if(res.status === 200){
+          createAlert({alertType:'success',alertContent:'预标注成功！'})
+          bus.$emit('annotate', res.data)
+        }
       },error => {
         console.log(error)
         createAlert({alertType:'danger',alertContent:'标注超时！'})
@@ -237,8 +239,8 @@ export default {
         e.preventDefault()
         this.save_annotate(true)
       } else if (this.tags.findIndex( value => {
-        tagType = value.type
-        return value.keyChar === keyChar
+        tagType = value.tag
+        return value.tagKey === keyChar
       }) !== -1 && this.$store.state.selectedIsValid) {
         let selected = this.$store.state.selected
         let index = this.data[this.activeItem].result.findIndex(value => {
@@ -253,6 +255,17 @@ export default {
     })
     bus.$on('update_annotate', (annotate_result) => {
       this.$set(this.data[this.activeItem], 'result', annotate_result)
+    })
+    request({
+      config:{
+        url:'api/tag_manager/get_tags',
+        method:'get',
+        params:{
+          tagType:this.$store.state.tagInfo.type
+        }
+      }
+    }).then(res => {
+      this.tags = res.data[this.$store.state.tagInfo.type]
     })
   },
 }

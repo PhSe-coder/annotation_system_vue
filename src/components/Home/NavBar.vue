@@ -10,11 +10,6 @@
           </router-link>
         </b-nav-item>
       </b-navbar-nav>
-      <b-navbar-nav>
-        <b-nav-item>
-          <router-link tag="li" :to="{name: 'tag_manage'}">标签管理</router-link>
-        </b-nav-item>
-      </b-navbar-nav>
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav>
           <b-nav-text>{{ project_info.project_type }}</b-nav-text>
@@ -52,6 +47,7 @@ export default {
       }
     }).then(res => {
       this.project_info = res.data
+      this.$store.commit('setTagInfo',{type:this.project_info.project_type})
     })
   },
   methods: {

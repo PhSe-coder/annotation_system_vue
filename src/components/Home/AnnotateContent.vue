@@ -82,7 +82,7 @@ export default {
         nodeList[1] = (datum[2])
         tag.append(this.text.slice(nodeList[0], nodeList[1]))
         let result = this.tags.find(value => {
-          return value.type === datum[1]
+          return value.tag === datum[1]
         })
         let MyComponent = Vue.extend({
           // template不能换行，换行会有bug，会导致鼠标选中的文本的位置不对！
