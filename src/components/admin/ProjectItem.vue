@@ -13,6 +13,10 @@
           <b-dropdown-item @click="$bvModal.show('modal_delete'+name)">
             <i class="fa fa-trash mr-1" aria-hidden="true"></i>Delete
           </b-dropdown-item>
+          <b-dropdown-item @click="exportProject($event, name)"
+                           :disabled="progress !== 100">
+            <i class="fa fa-share-square mr-1" aria-hidden="true"></i>Export
+          </b-dropdown-item>
         </b-dropdown>
         <b-modal :id="'modal_delete'+name" title="警告" size="sm" @ok="deleteProject($event,name)">
           是否删除该项目
@@ -23,7 +27,7 @@
         </b-modal>
       </div>
       <div class="card-body text-muted">
-        <span v-if="task_progress === 100" class="badge badge-success">Finished</span>
+        <span v-if="progress === 100" class="badge badge-success">Finished</span>
         <span v-else class="badge badge-secondary">Ongoing</span>
         <div class="row mb-3 mt-2">
           <div class="col-3">
@@ -44,11 +48,11 @@
         </div>
         <div class="row">
           <h6 class="card-text col-8">Progress</h6>
-          <h6 class="card-text col-4 text-right">{{ task_progress }}%</h6>
+          <h6 class="card-text col-4 text-right">{{ progress }}%</h6>
         </div>
         <div class="progress">
           <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" role="progressbar"
-               :style="{width: task_progress+'%'}" :aria-valuenow="task_progress"
+               :style="{width: progress+'%'}" :aria-valuenow="progress"
                aria-valuemin="0" aria-valuemax="100"></div>
         </div>
       </div>
@@ -65,15 +69,10 @@
 import {request} from "../../network/request";
 import bus from "../bus";
 import CreateProject from "./CreateProject";
+import {createAlert} from "../../script/alert";
 
 export default {
   name: "ProjectItem",
-  computed: {
-    task_progress() {
-      console.log(this.progress.toFixed(2) * 100)
-      return this.progress.toFixed(2) * 100
-    }
-  },
   components: {
     CreateProject
   },
@@ -130,6 +129,30 @@ export default {
         }
       }).then(res => {
         bus.$emit('update_project')
+      })
+    },
+    exportProject(e, name) {
+      request({
+        config: {
+          method: 'get',
+          responseType: 'blob',
+          url: '/api/annotation_task/export_project',
+          params: {
+            project_name: name
+          }
+        }
+      }).then(res => {
+        const blob = new Blob([res.data])
+        let url = window.URL.createObjectURL(blob)
+        //创建一个a标签元素，设置下载属性，点击下载，最后移除该元素
+        let link = document.createElement('a')
+        link.href = url
+        link.style.display = 'none'
+        //res.headers.fileName 取出后台返回下载的文件名
+        link.download = decodeURIComponent(res.headers.filename)
+        link.target = '_blank'
+        link.click()
+        window.URL.revokeObjectURL(url)
       })
     }
   },

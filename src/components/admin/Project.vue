@@ -9,10 +9,10 @@
       </div>
       <div class="col-6">
         <div class="text-center">
-          <button class="btn btn-primary">All</button>
+          <button class="btn" :class="[index===0 ? 'btn-primary' : 'btn-light']" @click="selectAll">All</button>
           <div class="btn-group ml-2" role="group" aria-label="button group">
-            <button type="button" class="btn btn-light">Ongoing</button>
-            <button type="button" class="btn btn-light">Finish</button>
+            <button type="button" class="btn" :class="[index===1 ? 'btn-primary' : 'btn-light']" @click="selectOngoing">Ongoing</button>
+            <button type="button" class="btn" :class="[index===2 ? 'btn-primary' : 'btn-light']" @click="selectFinish">Finish</button>
           </div>
         </div>
       </div>
@@ -20,21 +20,57 @@
         <button class="btn btn-dark" @click="logout">Logout</button>
       </div>
     </div>
-    <project-list></project-list>
+    <div class="row row-cols-2">
+      <!--    <div v-for="projectInfo_item in projectInfo" class="row mb-3">-->
+      <!--&lt;!&ndash;      v-if="item['project_progress'].toFixed(2) * 100 === 100"&ndash;&gt;-->
+      <!--      <project-item v-for="item in projectInfo_item" :key="item['project_name']" class="col-6"-->
+      <!--                    :description="item['project_description']" :name="item['project_name']"-->
+      <!--                    :type="item['project_type']" :tasks="item['count']"-->
+      <!--                    :members="item['project_members']" :progress="item['project_progress']" :users="usernames"></project-item>-->
+      <!--    </div>-->
+      <project-item v-show="item['project_progress'].toFixed(2) * 100 <= max_progress && min_progress <=item['project_progress'].toFixed(2) * 100"
+                    class="col mb-3" v-for="item in projectInfo" :key="item['project_name']"
+                    :description="item['project_description']" :name="item['project_name']"
+                    :type="item['project_type']" :tasks="item['count']"
+                    :members="item['project_members']" :progress="item['project_progress'].toFixed(2) * 100" :users="usernames">
+      </project-item>
+    </div>
   </div>
 </template>
 
 <script>
-import ProjectList from "./ProjectList";
 import {request} from "../../network/request";
+import ProjectItem from "./ProjectItem";
+import bus from "../bus";
 
 
 export default {
   name: "Home",
   components: {
-    ProjectList
+    ProjectItem
+  },
+  data(){
+    return {
+      index:0,
+      projectInfo: [],
+      usernames:[],
+      min_progress:0,
+      max_progress:100
+    }
   },
   methods:{
+    get_project_list() {
+      request({
+        config: {
+          url: '/api/annotation_task/get_project_info',
+          method: 'get'
+        }
+      }).then(res => {
+        if (res.status === 200) {
+          this.projectInfo = res.data
+        }
+      })
+    },
     logout(){
       request({
         config:{
@@ -50,8 +86,41 @@ export default {
           window.location.reload()
         }
       })
+    },
+    selectAll(){
+      this.index = 0
+      this.min_progress = 0
+      this.max_progress = 100
+    },
+    selectOngoing(){
+      this.index = 1
+      this.min_progress = 0
+      this.max_progress = 99
+    },
+    selectFinish(){
+      this.index = 2
+      this.min_progress = 100
+      this.max_progress = 100
     }
-  }
+  },
+  created() {
+    this.get_project_list()
+    bus.$on("update_project", () => {
+      this.get_project_list()
+    })
+    request({
+      config:{
+        url:'api/user/get_username/',
+        method:'post',
+        headers:{
+          'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
+        }
+      }
+    }).then(res => {
+      console.log(res.data)
+      this.usernames = res.data
+    })
+  },
 }
 </script>
 
