@@ -150,7 +150,6 @@ export default {
         link.style.display = 'none'
         //res.headers.fileName 取出后台返回下载的文件名
         link.download = decodeURIComponent(res.headers.filename)
-        link.target = '_blank'
         link.click()
         window.URL.revokeObjectURL(url)
       })
