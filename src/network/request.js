@@ -17,7 +17,7 @@ export function request(option) {
     console.log("request_error " + error)
   })
   instance.interceptors.response.use(cfg => {
-    console.log("response_ok ")
+    console.log("response_ok")
     console.log(cfg.data);
     if (cfg.data['is_authenticated'] !== undefined && !cfg.data['is_authenticated']) {
       router.replace({name: "Login"}).catch(err => {
@@ -25,7 +25,7 @@ export function request(option) {
     }
     return cfg
   }, error => {
-    console.log("response_error ")
+    console.log("response_error")
     console.log(error)
     alert(error)
     return error

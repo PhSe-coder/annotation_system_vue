@@ -111,10 +111,7 @@ export default {
     request({
       config:{
         url:'api/user/get_username/',
-        method:'post',
-        headers:{
-          'X-XSRF-TOKEN': this.$cookies.get('csrftoken')
-        }
+        method:'get',
       }
     }).then(res => {
       console.log(res.data)

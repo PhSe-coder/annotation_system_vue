@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-4">
-    <b-table bordered :busy="isBusy" striped hover :fields="fields" :items="items">
+    <b-table bordered :small="true" :busy="isBusy" striped hover :fields="fields" :items="items">
       <template #cell(ID)="data">
         {{data.index + 1}}
       </template>
