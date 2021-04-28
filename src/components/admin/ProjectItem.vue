@@ -109,7 +109,7 @@ export default {
     },
     users: {
       type: Array,
-      default: [],
+      default: ()=>[],
       required: true
     }
   },

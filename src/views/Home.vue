@@ -22,8 +22,8 @@ export default {
         })
       }
       else {
-        // alert('权限不足')
-        next({name: 'Login', replace: true})
+        alert('权限不足')
+        next({name: 'admin_project', replace: true})
       }
     })
   },

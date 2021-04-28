@@ -93,23 +93,20 @@ export default {
   beforeRouteEnter: (to, from, next) => {
     if (!Vue.$cookies.get('sessionid')) {
       next()
-      return
     }
-    request({
-      config: {
-        method: 'get',
-        url: '/api/user/is_authenticated/',
-      }
-    }).then(res => {
-      if (res.data['is_authenticated'] !== undefined && !res.data['is_authenticated']) {
-        next()
-      } else {
-        if(res.data['is_superuser'])
+    else {
+      request({
+          config: {
+            method: 'get',
+            url: '/api/user/is_authenticated/',
+          }
+        }).then(res => {
+        if (res.data['is_superuser'])
           next({name: 'admin_project', replace: true})
         else
           next({name: 'Home', replace: true})
-      }
-    })
+      })
+    }
   }
 }
 </script>

@@ -147,7 +147,7 @@ export default {
         this.isBusy = false
         if (res.status === 200) {
           createAlert({alertType: 'success', alertContent: '预标注成功！'})
-          bus.$emit('annotate', res.data)
+          this.data[this.activeItem].result = res.data
         }else{
           createAlert({alertType: 'danger', alertContent: '标注失败！'})
         }
@@ -282,7 +282,7 @@ export default {
         }
       }).then(res => {
         this.tags = res.data[this.$store.state.tagInfo.project_type]
-        console.log(this.tags)
+        // console.log(this.tags)
         this.$nextTick(()=>{
           let child_ele = $('.badge-child')
           let parent_ele = $('.badge-parent')
@@ -296,6 +296,7 @@ export default {
   // 销毁时清除事件，否则会导致事件在单次emit后被执行多次
   beforeDestroy() {
     bus.$off('get_tags')
+    bus.$off('update_annotate')
   }
 }
 

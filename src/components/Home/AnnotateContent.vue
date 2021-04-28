@@ -11,11 +11,6 @@ import {BAvatar, BBadge} from "bootstrap-vue";
 
 export default {
   name: "AnnotateContent",
-  data() {
-    return {
-      html_content: this.text,
-    }
-  },
   props: {
     text: {
       type: String,
@@ -30,11 +25,6 @@ export default {
       default: []
     }
   },
-  created() {
-    bus.$on('annotate', (resData) => {
-      this.setTags(resData)
-    })
-  },
   mounted() {
     this.$nextTick(()=>{
       this.setTags(this.result)
@@ -48,7 +38,7 @@ export default {
     }
   },
   methods: {
-    setTags: function (Data) {
+    setTags(Data) {
       let tag = document.createElement('p')
       tag.style.lineHeight = '2'
       tag.id = 'content'
@@ -109,6 +99,7 @@ export default {
                 return value[0] === this.datum
               })
               Data.splice(index, 1)
+              // 没有下面这句好像也可以
               bus.$emit('update_annotate', Data)
             },
           }
@@ -123,7 +114,7 @@ export default {
       }
       let ele = document.getElementById('content')
       ele.replaceWith(tag)
-      bus.$emit('update_annotate', Data)
+      // bus.$emit('update_annotate', Data)
     }
   }
 }

@@ -21,13 +21,6 @@
       </div>
     </div>
     <div class="row row-cols-2">
-      <!--    <div v-for="projectInfo_item in projectInfo" class="row mb-3">-->
-      <!--&lt;!&ndash;      v-if="item['project_progress'].toFixed(2) * 100 === 100"&ndash;&gt;-->
-      <!--      <project-item v-for="item in projectInfo_item" :key="item['project_name']" class="col-6"-->
-      <!--                    :description="item['project_description']" :name="item['project_name']"-->
-      <!--                    :type="item['project_type']" :tasks="item['count']"-->
-      <!--                    :members="item['project_members']" :progress="item['project_progress']" :users="usernames"></project-item>-->
-      <!--    </div>-->
       <project-item v-show="item['project_progress'].toFixed(2) * 100 <= max_progress && min_progress <=item['project_progress'].toFixed(2) * 100"
                     class="col mb-3" v-for="item in projectInfo" :key="item['project_name']"
                     :description="item['project_description']" :name="item['project_name']"

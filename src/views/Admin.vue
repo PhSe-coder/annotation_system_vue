@@ -2,7 +2,7 @@
   <div class="d-flex">
     <side-bar></side-bar>
     <keep-alive>
-      <router-view class="content"/>
+      <router-view/>
     </keep-alive>
   </div>
 </template>
@@ -27,15 +27,9 @@ export default {
         next()
       else {
         alert('权限不足')
-        next({name: 'Login', replace: true})
+        next({name: 'Home', replace: true})
       }
     })
   }
 }
 </script>
-
-<style scoped>
-.content {
-  margin-left: 210px;
-}
-</style>

@@ -117,6 +117,7 @@ router.beforeEach((to, from, next) => {
      next({
        name:'Login',
      })
+    return
   }
   if(!Vue.$cookies.get('csrftoken')){
     request({

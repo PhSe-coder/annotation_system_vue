@@ -6,7 +6,7 @@ axios.defaults.withCredentials = true
 export function request(option) {
   const instance = axios.create({
     baseURL: 'http://localhost:8000',
-    timeout: 5000
+    timeout: 10000
   })
   // 拦截器（请求成功/失败，响应成功/失败）
   instance.interceptors.request.use(cfg => {

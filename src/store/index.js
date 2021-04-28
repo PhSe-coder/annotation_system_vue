@@ -14,7 +14,8 @@ export default new Vuex.Store({
     },
     tagInfo:{
 
-    }
+    },
+    is_superuser:null,
   },
   mutations: {
     setName(state, name) {
@@ -28,7 +29,10 @@ export default new Vuex.Store({
     },
     setTagInfo(state, tagInfo){
       state.tagInfo = tagInfo
-    }
+    },
+    setIs_superuser(state, is_superuser) {
+      state.is_superuser = is_superuser
+    },
   },
   actions: {},
   modules: {}
